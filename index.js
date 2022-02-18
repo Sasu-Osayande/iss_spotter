@@ -66,3 +66,5 @@ nextISSTimesForMyLocation((error, passTimes) => {
 //   }
 //   console.log("It worked! Returned flyover times:", flyoverTimes);
 // });
+
+module.exports = { printPassTimes };
