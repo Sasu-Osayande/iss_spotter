@@ -11,7 +11,7 @@ const request = require("request");
 
 const fetchMyIP = function(callback) {
   // use request to fetch IP address from JSON API
-  request("https://api.ipify.org?format=json", function(error, response, body) {
+  request("https://api.ipify.org?format=json", (error, response, body) => {
     // error can be set if invalid domain, user is offline, etc.
     if (error) {
       return callback(error, null);
@@ -22,11 +22,24 @@ const fetchMyIP = function(callback) {
       return callback(Error(msg), null);
     }
     // if we get here, all's well and we got the data
-    else {
-      const ipAddress = JSON.parse(body).ip;
-      callback(null, ipAddress);
-    }
+    const ipAddress = JSON.parse(body).ip;
+    callback(null, ipAddress);
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  request(`https://freegeoip.app/json/${ip}`, (error, response, body) => {
+    if (error) {
+      return callback(error, null);
+    }
+    // if non-200 status, assume server error
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coordinates. Response: ${body}`;
+      return callback(Error(msg), null);
+    }
+    const { latitude, longitude } = JSON.parse(body);
+    callback(null, { latitude, longitude });
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
